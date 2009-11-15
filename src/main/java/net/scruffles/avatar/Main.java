@@ -13,37 +13,57 @@ import org.mortbay.jetty.servlet.ServletHolder;
 public class Main {
     private static final String PREFERENCES_PATH = "/net/scruffles/avatarServer";
     private static final String PREFERENCES_KEY = "path";
+    private static final String CLEAR_PREFERENCES_FLAG = "-clearConfigDir";
 
     public static void main(String[] arguments) throws Exception {
-        if (arguments.length == 1 && arguments[0].equals("-clearConfigDir")) {
-            clearPreferences();
-            showError("Directory preferences cleared");
-            System.exit(0);
+        if (isClearPreferencesFlagProvided(arguments)) {
+            clearPreferencesAndExit();
         }
 
         String path = getPathToFiles(arguments);
-        System.out.println("path = " + path);
-        if (!isValid(path)) {
-            showError("Could not find a valid images path");
-            System.exit(0);
+
+        if (isInvalid(path)) {
+            exitWithMessage("Could not find a valid images path");
         }
+
         saveToPreferencesApi(path);
 
+        startServer(path);
+    }
+
+    private static void startServer(String path) throws Exception {
         Server server = new Server(8080);
         Context root = new Context(server, "/", Context.SESSIONS);
         root.addServlet(new ServletHolder(new ImageServlet(path)), "/*");
         server.start();
     }
 
+    private static void exitWithMessage(String message) {
+        showError(message);
+        System.exit(0);
+    }
+
+    private static boolean isInvalid(String path) {
+        return !isValid(path);
+    }
+
+    private static boolean isClearPreferencesFlagProvided(String[] arguments) {
+        return arguments.length == 1 && arguments[0].equals(CLEAR_PREFERENCES_FLAG);
+    }
+
+    private static void clearPreferencesAndExit() throws BackingStoreException {
+        Preferences.userRoot().node(PREFERENCES_PATH).clear();
+        exitWithMessage("Directory preferences cleared");
+    }
+
     private static String getPathToFiles(String[] arguments) {
         if (arguments.length == 1) {
             String path = arguments[0];
-            if (isValid(path)) {
-                return path;
+            if (isInvalid(path)) {
+                exitWithMessage("An invalid path was specified on the command line");
             }
             else {
-                showError("An invalid path was specified on the command line");
-                System.exit(0);
+                return path;
             }
         }
 
@@ -53,10 +73,6 @@ public class Main {
         }
 
         return getPathFromUserPrompt();
-    }
-
-    private static void clearPreferences() throws BackingStoreException {
-        Preferences.userRoot().node(PREFERENCES_PATH).clear();
     }
 
     private static void saveToPreferencesApi(String path) {
