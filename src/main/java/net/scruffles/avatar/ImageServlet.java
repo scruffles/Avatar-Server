@@ -33,15 +33,16 @@ public class ImageServlet
 
     // todo consider adding exception handling
     protected void justDoIt(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int size = getImageSize(req);
         UserInfo userInfo = DataStore.lookupInfo(getHashFromRequest(req));
-        if (userInfo != null) {
 
+        if (userInfo != null) {
             resp.setContentType("image/jpg");
-            File dir = new File(path);
-            File file = new File(dir, userInfo.getIconLocation());
+
+            File file = findImageFile(userInfo);
 
             BufferedImage image = ImageIO.read(file);
-            image = createResizedCopy(image, 80, 80, true);
+            image = createResizedCopy(image, size, size, true);
 
             ImageIO.write(image, "jpg", resp.getOutputStream());
             resp.getOutputStream().flush();
@@ -49,6 +50,21 @@ public class ImageServlet
         else {
             resp.getOutputStream().write(("<html><body>not found").getBytes());
         }
+    }
+
+    private int getImageSize(HttpServletRequest req) {
+        String sizeString = req.getParameter("s");
+        int size = 80;
+        if (sizeString != null) {
+            size = Integer.parseInt(sizeString);
+        }
+        return Math.min(512, size);
+    }
+
+    private File findImageFile(UserInfo userInfo) {
+        File dir = new File(path);
+        File file = new File(dir, userInfo.getIconLocation());
+        return file;
     }
 
     private BufferedImage createResizedCopy(Image originalImage, int scaledWidth, int scaledHeight,
