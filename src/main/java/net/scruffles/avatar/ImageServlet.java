@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -44,15 +45,20 @@ public class ImageServlet
 
             File file = findImageFile(userInfo);
 
-            BufferedImage image = ImageIO.read(file);
-            image = createResizedCopy(image, size, size, true);
-
-            ImageIO.write(image, "jpg", resp.getOutputStream());
-            resp.getOutputStream().flush();
+            writeImage(resp, size, file);
         }
         else {
-            resp.getOutputStream().write(("<html><body>not found").getBytes());
+            URL resource = ImageServlet.class.getResource("/default.gif");
+            writeImage(resp, size, new File(resource.getFile()));
         }
+    }
+
+    private void writeImage(HttpServletResponse resp, int size, File file) throws IOException {
+        BufferedImage image = ImageIO.read(file);
+        image = createResizedCopy(image, size, size, true);
+
+        ImageIO.write(image, "jpg", resp.getOutputStream());
+        resp.getOutputStream().flush();
     }
 
     private int getImageSize(HttpServletRequest req) {
