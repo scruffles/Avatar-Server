@@ -1,8 +1,12 @@
 package net.scruffles.avatar;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,17 +40,29 @@ public class ImageServlet
             File dir = new File(path);
             File file = new File(dir, userInfo.getIconLocation());
 
-            FileInputStream fileInputStream = new FileInputStream(file);
-            int i = fileInputStream.read();
-            while (i != -1) {
-                resp.getOutputStream().write(i);
-                i = fileInputStream.read();
-            }
+            BufferedImage image = ImageIO.read(file);
+            image = createResizedCopy(image, 80, 80, true);
+
+            ImageIO.write(image, "jpg", resp.getOutputStream());
             resp.getOutputStream().flush();
         }
         else {
             resp.getOutputStream().write(("<html><body>not found").getBytes());
         }
+    }
+
+    private BufferedImage createResizedCopy(Image originalImage, int scaledWidth, int scaledHeight,
+            boolean preserveAlpha)
+    {
+        int imageType = preserveAlpha ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+        BufferedImage scaledBI = new BufferedImage(scaledWidth, scaledHeight, imageType);
+        Graphics2D g = scaledBI.createGraphics();
+        if (preserveAlpha) {
+            g.setComposite(AlphaComposite.Src);
+        }
+        g.drawImage(originalImage, 0, 0, scaledWidth, scaledHeight, null);
+        g.dispose();
+        return scaledBI;
     }
 
     private String getHashFromRequest(HttpServletRequest req) {
