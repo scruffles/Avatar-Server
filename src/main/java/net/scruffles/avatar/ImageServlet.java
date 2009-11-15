@@ -16,6 +16,8 @@ public class ImageServlet
         extends HttpServlet
 {
     private String path;
+    private static final int MAX_SIZE = 512;
+    private static final int DEFAULT_SIZE = 80;
 
     public ImageServlet(String path) {
         this.path = path;
@@ -54,11 +56,11 @@ public class ImageServlet
 
     private int getImageSize(HttpServletRequest req) {
         String sizeString = req.getParameter("s");
-        int size = 80;
+        int size = DEFAULT_SIZE;
         if (sizeString != null) {
             size = Integer.parseInt(sizeString);
         }
-        return Math.min(512, size);
+        return Math.min(MAX_SIZE, size);
     }
 
     private File findImageFile(UserInfo userInfo) {
