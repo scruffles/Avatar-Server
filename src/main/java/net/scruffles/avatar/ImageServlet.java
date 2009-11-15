@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -88,5 +89,10 @@ public class ImageServlet
         String hash = url.substring(url.lastIndexOf("/") + 1);
         hash = hash.replaceAll("\\.jpg$|\\.gif$|\\.png$", "");
         return hash;
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        DataStore.initialize(new File(path));
     }
 }

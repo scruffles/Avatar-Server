@@ -18,20 +18,16 @@ public class DataStore {
 
     private final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
-    private static Map<String, UserInfo> infoByHash;
+    private Map<String, UserInfo> infoByHash;
 
     // todo allow the user to choose the location of the config file
     private static final String CONFIG_FILE = "avatarConfig.xml";
-
-    private DataStore() {
-        infoByHash = new HashMap<String, UserInfo>();
-        load();
-        for (UserInfo userInfo : infoByHash.values()) {
-            System.out.println(userInfo);
-        }
-    }
+    private boolean isInitialized = false;
 
     public static DataStore getInstance() {
+        if (!instance.isInitialized) {
+            throw new RuntimeException("must initialize first");
+        }
         return instance;
     }
 
@@ -75,11 +71,14 @@ public class DataStore {
         }
     }
 
-    public void load() {
+    public void load(File configDir) {
         FileInputStream stream = null;
         LOCK.writeLock().lock();
         try {
-            File configFile = new File(CONFIG_FILE);
+            if (infoByHash == null) {
+                instance.infoByHash = new HashMap<String, UserInfo>();
+            }
+            File configFile = new File(configDir, CONFIG_FILE);
             stream = new FileInputStream(configFile);
             infoByHash.clear();
             infoByHash.putAll((Map<? extends String, ? extends UserInfo>)new XStream().fromXML(stream));
@@ -95,9 +94,20 @@ public class DataStore {
 
     private void closeQuietly(Closeable stream) {
         try {
-            stream.close();
+            if (stream != null) {
+                stream.close();
+            }
         }
         catch (IOException ignore) {
         }
+    }
+
+    public static void initialize(File configDir) {
+        DataStore instance = DataStore.instance;
+        instance.load(configDir);
+        for (UserInfo userInfo : instance.infoByHash.values()) {
+            System.out.println(userInfo);
+        }
+        instance.isInitialized = true;
     }
 }

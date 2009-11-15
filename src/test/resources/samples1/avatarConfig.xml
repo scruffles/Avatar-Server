@@ -1,0 +1,26 @@
+<map>
+    <entry>
+        <string>e537f876b0401f84a9d4908f408b7471</string>
+        <net.scruffles.avatar.UserInfo>
+            <hash>e537f876b0401f84a9d4908f408b7471</hash>
+            <emailAddress>bryan@scruffles.net</emailAddress>
+            <iconLocation>bryan.jpg</iconLocation>
+        </net.scruffles.avatar.UserInfo>
+    </entry>
+    <entry>
+        <string>c627e06b14c98d3204512dc7a162da77</string>
+        <net.scruffles.avatar.UserInfo>
+            <hash>c627e06b14c98d3204512dc7a162da77</hash>
+            <emailAddress>kimberly@scruffles.net</emailAddress>
+            <iconLocation>kimberly.jpg</iconLocation>
+        </net.scruffles.avatar.UserInfo>
+    </entry>
+    <entry>
+        <string>7c372d9ab9ce422a996379ac78b402c7</string>
+        <net.scruffles.avatar.UserInfo>
+            <hash>7c372d9ab9ce422a996379ac78b402c7</hash>
+            <emailAddress>andrew@scruffles.net</emailAddress>
+            <iconLocation>andrew.jpg</iconLocation>
+        </net.scruffles.avatar.UserInfo>
+    </entry>
+</map>
