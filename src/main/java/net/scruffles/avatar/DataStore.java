@@ -14,14 +14,28 @@ import com.thoughtworks.xstream.XStream;
 
 public class DataStore {
 
-    private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    private final static DataStore instance = new DataStore();
 
-    private static Map<String, UserInfo> infoByHash = new HashMap<String, UserInfo>();
+    private final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+
+    private static Map<String, UserInfo> infoByHash;
 
     // todo allow the user to choose the location of the config file
     private static final String CONFIG_FILE = "avatarConfig.xml";
 
-    public static UserInfo lookupInfo(String hash) {
+    private DataStore() {
+        infoByHash = new HashMap<String, UserInfo>();
+        load();
+        for (UserInfo userInfo : infoByHash.values()) {
+            System.out.println(userInfo);
+        }
+    }
+
+    public static DataStore getInstance() {
+        return instance;
+    }
+
+    public UserInfo lookupInfo(String hash) {
         LOCK.readLock().lock();
         try {
             return infoByHash.get(hash);
@@ -31,7 +45,7 @@ public class DataStore {
         }
     }
 
-    public static void addUserInfo(UserInfo userInfo) {
+    public void addUserInfo(UserInfo userInfo) {
         LOCK.writeLock().lock();
         try {
             infoByHash.put(userInfo.getHash(), userInfo);
@@ -41,7 +55,7 @@ public class DataStore {
         }
     }
 
-    public static void persist() {
+    public void persist() {
         File configFile = new File(CONFIG_FILE);
         FileOutputStream fos = null;
 
@@ -61,7 +75,7 @@ public class DataStore {
         }
     }
 
-    public static void load() {
+    public void load() {
         FileInputStream stream = null;
         LOCK.writeLock().lock();
         try {
@@ -79,19 +93,11 @@ public class DataStore {
         }
     }
 
-    private static void closeQuietly(Closeable stream) {
+    private void closeQuietly(Closeable stream) {
         try {
             stream.close();
         }
         catch (IOException ignore) {
-        }
-    }
-
-    static {
-        load();
-
-        for (UserInfo userInfo : infoByHash.values()) {
-            System.out.println(userInfo);
         }
     }
 }

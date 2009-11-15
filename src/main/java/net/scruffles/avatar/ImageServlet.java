@@ -36,7 +36,7 @@ public class ImageServlet
     // todo consider adding exception handling
     protected void justDoIt(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         int size = getImageSize(req);
-        UserInfo userInfo = DataStore.lookupInfo(getHashFromRequest(req));
+        UserInfo userInfo = DataStore.getInstance().lookupInfo(getHashFromRequest(req));
 
         if (userInfo != null) {
             resp.setContentType("image/jpg");
