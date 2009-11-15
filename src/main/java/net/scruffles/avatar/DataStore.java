@@ -33,9 +33,9 @@ public class DataStore {
 
     // todo get this from a persistent store
     static {
-        addUserInfo(new UserInfo("bryan@scruffles.net", "/someDir/byransIcon.png"));
-        addUserInfo(new UserInfo("Bryan.Young@scruffles.net", "/someDir/byransOtherIcon.png"));
-        addUserInfo(new UserInfo("kimberly@scruffles.net", "/someDir/kimsIcon.png"));
+        addUserInfo(new UserInfo("bryan@scruffles.net", "bryan.jpg"));
+        addUserInfo(new UserInfo("andrew@scruffles.net", "andrew.jpg"));
+        addUserInfo(new UserInfo("kimberly@scruffles.net", "kimberly.jpg"));
 
         for (UserInfo userInfo : infoByHash.values()) {
             System.out.println(userInfo);

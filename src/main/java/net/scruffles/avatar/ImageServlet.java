@@ -1,5 +1,7 @@
 package net.scruffles.avatar;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,6 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 public class ImageServlet
         extends HttpServlet
 {
+    private String path;
+
+    public ImageServlet(String path) {
+        this.path = path;
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -24,7 +31,18 @@ public class ImageServlet
     protected void justDoIt(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         UserInfo userInfo = DataStore.lookupInfo(getHashFromRequest(req));
         if (userInfo != null) {
-            resp.getOutputStream().write(("<html><body>found it: " + userInfo.getIconLocation()).getBytes());
+
+            resp.setContentType("image/jpg");
+            File dir = new File(path);
+            File file = new File(dir, userInfo.getIconLocation());
+
+            FileInputStream fileInputStream = new FileInputStream(file);
+            int i = fileInputStream.read();
+            while (i != -1) {
+                resp.getOutputStream().write(i);
+                i = fileInputStream.read();
+            }
+            resp.getOutputStream().flush();
         }
         else {
             resp.getOutputStream().write(("<html><body>not found").getBytes());
