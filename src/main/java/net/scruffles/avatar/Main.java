@@ -1,6 +1,7 @@
 package net.scruffles.avatar;
 
 import java.io.File;
+import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
@@ -9,6 +10,7 @@ import javax.swing.JOptionPane;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 public class Main {
     private static final String PREFERENCES_PATH = "/net/scruffles/avatarServer";
@@ -33,9 +35,21 @@ public class Main {
 
     private static void startServer(String path) throws Exception {
         Server server = new Server(8080);
-        Context root = new Context(server, "/", Context.SESSIONS);
-        root.addServlet(new ServletHolder(new IncludedImageServlet(path)), "/included/*");
-        root.addServlet(new ServletHolder(new ImageByHashcodeServlet(path)), "/*");
+
+        URL warUrl = Main.class.getClassLoader().getResource("webapp");
+        String warUrlString = warUrl.toExternalForm();
+        server.setHandler(new WebAppContext(warUrlString, "/choose"));
+
+        Context context = new Context(server, "/avatars", Context.SESSIONS);
+        context.addServlet(new ServletHolder(new IncludedImageServlet(path)), "/included/*");
+        context.addServlet(new ServletHolder(new ImageByHashcodeServlet(path)), "/*");
+
+        System.out.println("Initialized.. ");
+        System.out.println("Try one of these URLs:");
+        System.out.println("   http://localhost:8080/avatars/e537f876b0401f84a9d4908f408b7471.jpg");
+        System.out.println("   http://localhost:8080/avatars/included/ant.jpg");
+        System.out.println("   http://localhost:8080/choose/test.jsp");
+
         server.start();
     }
 
