@@ -14,14 +14,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ImageServlet
+public class ImageByHashcodeServlet
         extends HttpServlet
 {
     private String path;
     private static final int MAX_SIZE = 512;
     private static final int DEFAULT_SIZE = 80;
 
-    public ImageServlet(String path) {
+    public ImageByHashcodeServlet(String path) {
         this.path = path;
     }
 
@@ -48,20 +48,27 @@ public class ImageServlet
             writeImage(resp, size, file);
         }
         else {
-            URL resource = ImageServlet.class.getResource("/default.gif");
+            URL resource = ImageByHashcodeServlet.class.getResource("/default.gif");
             writeImage(resp, size, new File(resource.getFile()));
         }
     }
 
-    private void writeImage(HttpServletResponse resp, int size, File file) throws IOException {
-        BufferedImage image = ImageIO.read(file);
+    protected void writeImage(HttpServletResponse resp, int size, File file) throws IOException {
+        writeImage(resp, size, ImageIO.read(file));
+    }
+
+    protected void writeImage(HttpServletResponse resp, int size, URL url) throws IOException {
+        writeImage(resp, size, ImageIO.read(url));
+    }
+
+    private void writeImage(HttpServletResponse resp, int size, BufferedImage image) throws IOException {
         image = createResizedCopy(image, size, size, true);
 
         ImageIO.write(image, "jpg", resp.getOutputStream());
         resp.getOutputStream().flush();
     }
 
-    private int getImageSize(HttpServletRequest req) {
+    protected int getImageSize(HttpServletRequest req) {
         String sizeString = req.getParameter("s");
         int size = DEFAULT_SIZE;
         if (sizeString != null) {

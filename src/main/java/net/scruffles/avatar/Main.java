@@ -34,7 +34,8 @@ public class Main {
     private static void startServer(String path) throws Exception {
         Server server = new Server(8080);
         Context root = new Context(server, "/", Context.SESSIONS);
-        root.addServlet(new ServletHolder(new ImageServlet(path)), "/*");
+        root.addServlet(new ServletHolder(new IncludedImageServlet(path)), "/included/*");
+        root.addServlet(new ServletHolder(new ImageByHashcodeServlet(path)), "/*");
         server.start();
     }
 
