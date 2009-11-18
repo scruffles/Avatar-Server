@@ -40,12 +40,16 @@ public class Main {
         String warUrlString = warUrl.toExternalForm();
         server.setHandler(new WebAppContext(warUrlString, "/choose"));
 
-        Context context = new Context(server, "/avatars", Context.SESSIONS);
+        Context context = new Context(server, "/register", Context.SESSIONS);
+        context.addServlet(new ServletHolder(new RegistrationServlet()), "/*");
+
+        context = new Context(server, "/avatars", Context.SESSIONS);
         context.addServlet(new ServletHolder(new IncludedImageServlet(path)), "/included/*");
         context.addServlet(new ServletHolder(new ImageByHashcodeServlet(path)), "/*");
 
         System.out.println("Initialized.. ");
         System.out.println("Try one of these URLs:");
+        System.out.println("   http://localhost:8080/choose/test.jsp");
         System.out.println("   http://localhost:8080/avatars/e537f876b0401f84a9d4908f408b7471.jpg");
         System.out.println("   http://localhost:8080/avatars/included/ant.jpg");
         System.out.println("   http://localhost:8080/choose/test.jsp");

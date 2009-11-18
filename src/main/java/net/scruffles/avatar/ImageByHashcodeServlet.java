@@ -45,6 +45,10 @@ public class ImageByHashcodeServlet
 
             File file = findImageFile(userInfo);
 
+            if (!file.exists()) {
+                System.out.println("Unable to load image: " + file.getAbsolutePath());
+            }
+
             writeImage(resp, size, file);
         }
         else {
@@ -78,9 +82,7 @@ public class ImageByHashcodeServlet
     }
 
     private File findImageFile(UserInfo userInfo) {
-        File dir = new File(path);
-        File file = new File(dir, userInfo.getIconLocation());
-        return file;
+        return new File(userInfo.getIconLocation());
     }
 
     private BufferedImage createResizedCopy(Image originalImage, int scaledWidth, int scaledHeight,

@@ -35,7 +35,7 @@
 <h1 style="background-color: blue; padding: 20px;">AvatarServer</h1>
 
 <div style="font-size: 15pt; padding-left: 40px;">
-    <form action="registerUser" method="GET">
+    <form action="/register" method="GET">
         To register, enter your email address:<br/>
         <input id="email" type="text" name="email" value="someUser@someDomain.com"
                style="font-size: 15pt; width: 350px; color: gray;" onfocus="possiblyClearEmailAddress(this)"

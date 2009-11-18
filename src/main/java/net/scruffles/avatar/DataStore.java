@@ -20,9 +20,9 @@ public class DataStore {
 
     private Map<String, UserInfo> infoByHash;
 
-    // todo allow the user to choose the location of the config file
     private static final String CONFIG_FILE = "avatarConfig.xml";
     private boolean isInitialized = false;
+    private File configDir;
 
     public static DataStore getInstance() {
         if (!instance.isInitialized) {
@@ -52,7 +52,7 @@ public class DataStore {
     }
 
     public void persist() {
-        File configFile = new File(CONFIG_FILE);
+        File configFile = new File(configDir, CONFIG_FILE);
         FileOutputStream fos = null;
 
         LOCK.readLock().lock();
@@ -61,6 +61,7 @@ public class DataStore {
             String string = new XStream().toXML(infoByHash);
             fos.write(string.getBytes());
             fos.close();
+            System.out.println("Saving configuration to " + configFile.getAbsolutePath());
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -72,6 +73,7 @@ public class DataStore {
     }
 
     public void load(File configDir) {
+        this.configDir = configDir;
         FileInputStream stream = null;
         LOCK.writeLock().lock();
         try {
@@ -79,6 +81,11 @@ public class DataStore {
                 instance.infoByHash = new HashMap<String, UserInfo>();
             }
             File configFile = new File(configDir, CONFIG_FILE);
+            if (!configFile.exists()) {
+                System.out.println("File doesn't exist: " + configFile.getAbsolutePath());
+                return;
+            }
+            System.out.println("Reading configuration from " + configFile.getAbsolutePath());
             stream = new FileInputStream(configFile);
             infoByHash.clear();
             infoByHash.putAll((Map<? extends String, ? extends UserInfo>)new XStream().fromXML(stream));
