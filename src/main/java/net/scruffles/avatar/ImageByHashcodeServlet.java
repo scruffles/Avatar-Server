@@ -1,8 +1,5 @@
 package net.scruffles.avatar;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +63,7 @@ public class ImageByHashcodeServlet
     }
 
     private void writeImage(HttpServletResponse resp, int size, BufferedImage image) throws IOException {
-        image = createResizedCopy(image, size, size, true);
+        image = ImageUtil.createResizedCopy(image, size, size, true);
 
         ImageIO.write(image, "jpg", resp.getOutputStream());
         resp.getOutputStream().flush();
@@ -83,20 +80,6 @@ public class ImageByHashcodeServlet
 
     private File findImageFile(UserInfo userInfo) {
         return new File(userInfo.getIconLocation());
-    }
-
-    private BufferedImage createResizedCopy(Image originalImage, int scaledWidth, int scaledHeight,
-            boolean preserveAlpha)
-    {
-        int imageType = preserveAlpha ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-        BufferedImage scaledBI = new BufferedImage(scaledWidth, scaledHeight, imageType);
-        Graphics2D g = scaledBI.createGraphics();
-        if (preserveAlpha) {
-            g.setComposite(AlphaComposite.Src);
-        }
-        g.drawImage(originalImage, 0, 0, scaledWidth, scaledHeight, null);
-        g.dispose();
-        return scaledBI;
     }
 
     private String getHashFromRequest(HttpServletRequest req) {
